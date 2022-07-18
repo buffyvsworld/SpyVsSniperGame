@@ -12,14 +12,14 @@ public class SpyMovement : MonoBehaviour
 
 
 
-    void Start()
+    private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
       MovementLogic();
     }
