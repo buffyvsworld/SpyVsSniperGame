@@ -6,21 +6,38 @@ public class SpyMovement : MonoBehaviour
 {
     [SerializeField] private float speed;
 
+
     private Rigidbody2D rb;
-    private SpriteRenderer sr;
     private Vector2 moveVelocity;
+    private bool facingRight = true;
+    private Animator animator;
+
+    private Vector3 oldPosition;
 
 
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
+        animator = GetComponentInChildren<Animator>() as Animator;
+
+        oldPosition = transform.position;
     }
 
     // Update is called once per frame
-    private void Update()
+    private void FixedUpdate()
     {
+      if(oldPosition == transform.position)
+      {
+        animator.SetBool("isWalking", false);
+      }
+
+      else if(oldPosition != transform.position)
+      {
+        animator.SetBool("isWalking", true);
+        oldPosition = transform.position;
+      }
+
       MovementLogic();
     }
 
@@ -29,15 +46,28 @@ public class SpyMovement : MonoBehaviour
       Vector2 moveInput = new Vector2 (Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
       moveVelocity = moveInput.normalized * speed;
 
-      if(Input.GetAxis("Horizontal") < 0)
+      if(facingRight && Input.GetAxis("Horizontal") < 0)
       {
-        sr.flipX = true;
+        Flip();
       }
-      else if (Input.GetAxis("Horizontal") > 0)
+      else if(!facingRight && Input.GetAxis("Horizontal") > 0)
       {
-        sr.flipX = false;
+        Flip();
+      }
+
+      if (Input.GetAxis("Horizontal") != 0 || Input.GetAxis("Vertical") != 0)
+      {
+
       }
 
       rb.MovePosition(rb.position + moveVelocity * Time.deltaTime);
     }
+
+    private void Flip()
+   {
+       facingRight = !facingRight;
+       Vector3 Scaler = transform.localScale;
+       Scaler.x *= -1;
+       transform.localScale = Scaler;
+   }
 }

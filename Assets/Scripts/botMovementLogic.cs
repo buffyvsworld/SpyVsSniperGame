@@ -10,15 +10,17 @@ public class botMovementLogic : MonoBehaviour
     [SerializeField] private bool isBotStopped;
 
     private Rigidbody2D rb;
-    private SpriteRenderer sr;
     private Vector2 moveVelocity;
+    private Animator animator;
+    private bool facingRight = true;
 
     private Random rnd = new Random();
+
 
     private void Start()
     {
       rb = GetComponent<Rigidbody2D>();
-      sr = GetComponent<SpriteRenderer>();
+      animator = GetComponentInChildren<Animator>() as Animator;
 
       StartCoroutine(MoveCoroutine());
     }
@@ -27,7 +29,13 @@ public class botMovementLogic : MonoBehaviour
     {
       if(!isBotStopped)
       {
+        animator.SetBool("isWalking", true);
         StartMove();
+      }
+
+      if(isBotStopped)
+      {
+        animator.SetBool("isWalking", false);
       }
     }
 
@@ -36,7 +44,6 @@ public class botMovementLogic : MonoBehaviour
       while (true)
       {
         yield return new WaitForSeconds(timeBtwBotMove);
-        RandomizeMoveDirection();
 
         int checkAction = Random.Range(0, 2);
 
@@ -46,6 +53,7 @@ public class botMovementLogic : MonoBehaviour
         }
         else if (checkAction == 1)
         {
+          RandomizeMoveDirection();
           isBotStopped = false;
         }
       }
@@ -56,13 +64,13 @@ public class botMovementLogic : MonoBehaviour
     {
       moveVelocity = moveDirection.normalized * speed;
 
-      if(moveDirection.x < 0)
+      if(facingRight && moveDirection.x < 0)
       {
-        sr.flipX = true;
+        Flip();
       }
-      else if (moveDirection.x > 0)
+      else if (!facingRight && moveDirection.x > 0)
       {
-        sr.flipX = false;
+        Flip();
       }
 
       rb.MovePosition(rb.position + moveVelocity * Time.deltaTime);
@@ -72,5 +80,13 @@ public class botMovementLogic : MonoBehaviour
     {
       moveDirection = new Vector2(Random.Range(-1,2), Random.Range(-1,2));
     }
+
+    private void Flip()
+   {
+       facingRight = !facingRight;
+       Vector3 Scaler = transform.localScale;
+       Scaler.x *= -1;
+       transform.localScale = Scaler;
+   }
 
 }
