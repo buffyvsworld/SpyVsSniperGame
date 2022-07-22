@@ -13,6 +13,7 @@ public class botMovementLogic : MonoBehaviour
     private Vector2 moveVelocity;
     private Animator animator;
     private bool facingRight = true;
+    private Vector3 oldPosition;
 
     private Random rnd = new Random();
 
@@ -25,18 +26,24 @@ public class botMovementLogic : MonoBehaviour
       StartCoroutine(MoveCoroutine());
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
       if(!isBotStopped)
       {
-        animator.SetBool("isWalking", true);
         StartMove();
       }
 
-      if(isBotStopped)
+      if(oldPosition == transform.position)
       {
         animator.SetBool("isWalking", false);
       }
+
+      else if(oldPosition != transform.position)
+      {
+        animator.SetBool("isWalking", true);
+        oldPosition = transform.position;
+      }
+
     }
 
     private IEnumerator MoveCoroutine()
@@ -50,6 +57,7 @@ public class botMovementLogic : MonoBehaviour
         if(checkAction == 0)
         {
           isBotStopped = true;
+          StopMove();
         }
         else if (checkAction == 1)
         {
@@ -74,6 +82,11 @@ public class botMovementLogic : MonoBehaviour
       }
 
       rb.MovePosition(rb.position + moveVelocity * Time.deltaTime);
+    }
+
+    private void StopMove()
+    {
+      rb.velocity = new Vector2(0f,0f);
     }
 
     private void RandomizeMoveDirection()
